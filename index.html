@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AstroUQuest • NASAltura</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <img class="logo" src="logo-nasalTuras.png" alt="NASAltura logo" />
+      <div class="brand">
+        <b>AstroUQuest</b>
+        <span>Landing page educativa • Desenvolvido por <strong>NASAltura</strong></span>
+      </div>
+    </header>
+
+    <!-- AUTH -->
+    <section class="auth card" id="authCard" aria-live="polite">
+      <div class="tabs" role="tablist" aria-label="Acessar conta">
+        <button class="tab active" id="tabSignup" role="tab" aria-selected="true">Criar conta</button>
+        <button class="tab" id="tabLogin" role="tab" aria-selected="false">Entrar</button>
+      </div>
+
+      <form id="formSignup" autocomplete="off">
+        <div class="field"><label for="suName">Nome</label><input id="suName" required placeholder="Seu nome" /></div>
+        <div class="field"><label for="suEmail">E-mail</label><input id="suEmail" type="email" required placeholder="voce@email.com" /></div>
+        <div class="field"><label for="suPass">Senha</label><input id="suPass" type="password" minlength="4" required placeholder="Mín. 4 caracteres" /></div>
+        <button class="btn" type="submit">Criar minha conta</button>
+        <div class="hint">Os dados ficam apenas no seu navegador (localStorage).</div>
+      </form>
+
+      <form id="formLogin" style="display:none" autocomplete="off">
+        <div class="field"><label for="liEmail">E-mail</label><input id="liEmail" type="email" required placeholder="voce@email.com" /></div>
+        <div class="field"><label for="liPass">Senha</label><input id="liPass" type="password" required placeholder="Sua senha" /></div>
+        <button class="btn" type="submit">Entrar</button>
+        <div class="hint">Esqueceu? Você pode recriar a conta usando o mesmo e-mail.</div>
+      </form>
+    </section>
+
+    <!-- DASHBOARD -->
+    <section class="dashboard" id="dashboard">
+      <div class="grid">
+        <!-- Profile / Sidebar -->
+        <aside class="profile card">
+          <div style="display:flex;align-items:center;gap:12px">
+            <img class="logo" src="logo-nasalTuras.png" alt="" style="width:46px;height:46px">
+            <div>
+              <div id="pfName" style="font-weight:800;font-size:1.05rem">—</div>
+              <div class="pill">Perfil privado • NASAltura</div>
+            </div>
+          </div>
+
+          <div class="points">
+            <span class="badge">Nível <span id="pfLevel">1</span></span>
+            <b id="pfPoints">0</b> pontos
+          </div>
+          <div class="progress" aria-label="Progresso do quiz">
+            <span id="progressBar"></span>
+          </div>
+          <div class="actions">
+            <button class="btn secondary" id="btnReset" type="button">Resetar progresso</button>
+            <button class="btn secondary" id="btnLogout" type="button">Sair</button>
+          </div>
+        </aside>
+
+        <!-- Quiz / Main -->
+        <main>
+          <div class="quiz card" id="quizCard">
+            <div class="qtitle" id="qTitle">Carregando…</div>
+            <div class="options" id="options"></div>
+            <div class="feedback" id="feedback"></div>
+            <div class="footer-actions">
+              <span class="small" id="counter">Questão — / —</span>
+              <button class="btn" id="btnNext" type="button" disabled>Próxima</button>
+            </div>
+          </div>
+
+          <div class="cert-wrap card" id="certWrap" aria-live="polite">
+            <h3 style="margin:0 0 8px">Parabéns, <span id="winnerName">Explorador</span>! 🎓</h3>
+            <p style="margin-top:6px;color:var(--muted)">
+              Você concluiu todas as questões do módulo <b>AstroUQuest</b>. Gere seu certificado oficial:
+            </p>
+            <div class="cta">
+              <button class="btn" id="btnCert" type="button">Gerar Certificado</button>
+              <a id="dlLink" class="btn secondary" download="certificado-astros.png" style="display:none">Baixar PNG</a>
+            </div>
+            <div style="margin-top:12px">
+              <canvas id="certCanvas" width="1200" height="800" aria-label="Certificado"></canvas>
+            </div>
+          </div>
+        </main>
+      </div>
+    </section>
+  </div>
+
+  <div class="orb" aria-hidden="true"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
