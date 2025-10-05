@@ -27,14 +27,14 @@
         <div class="field"><label for="suName">Nome</label><input id="suName" required placeholder="Seu nome" /></div>
         <div class="field"><label for="suEmail">E-mail</label><input id="suEmail" type="email" required placeholder="voce@email.com" /></div>
         <div class="field"><label for="suPass">Senha</label><input id="suPass" type="password" minlength="4" required placeholder="Mín. 4 caracteres" /></div>
-        <button class="btn" type="submit">Criar minha conta</button>
+        <button class="btn full" type="submit">Criar minha conta</button>
         <div class="hint">Dica: os dados ficam apenas no seu navegador (localStorage).</div>
       </form>
 
       <form id="formLogin" style="display:none" autocomplete="off">
         <div class="field"><label for="liEmail">E-mail</label><input id="liEmail" type="email" required placeholder="voce@email.com" /></div>
         <div class="field"><label for="liPass">Senha</label><input id="liPass" type="password" required placeholder="Sua senha" /></div>
-        <button class="btn" type="submit">Entrar</button>
+        <button class="btn full" type="submit">Entrar</button>
         <div class="hint">Esqueceu? Você pode recriar a conta usando o mesmo e-mail (sobrescreve a anterior).</div>
       </form>
     </section>
@@ -44,10 +44,10 @@
       <div class="grid">
         <!-- Profile / Sidebar -->
         <aside class="profile card">
-          <div style="display:flex;align-items:center;gap:12px">
+          <div class="profile-header">
             <img class="logo" src="logo-nasalTuras.png" alt="" style="width:46px;height:46px">
             <div>
-              <div id="pfName" style="font-weight:800;font-size:1.05rem">—</div>
+              <div id="pfName" class="pfname">—</div>
               <div class="pill">Perfil privado • NASAltura</div>
             </div>
           </div>
@@ -60,7 +60,7 @@
             <span id="progressBar"></span>
           </div>
           <div class="actions">
-            <button class="btn secondary" id="btnReset" type="button">Resetar progresso</button>
+            <button class="btn secondary" id="btnReset" type="button">Resetar</button>
             <button class="btn secondary" id="btnLogout" type="button">Sair</button>
           </div>
         </aside>
@@ -78,15 +78,15 @@
           </div>
 
           <div class="cert-wrap card" id="certWrap" aria-live="polite">
-            <h3 style="margin:0 0 8px">Parabéns, <span id="winnerName">Explorador</span>! 🎓</h3>
-            <p style="margin-top:6px;color:var(--muted)">
+            <h3 class="cert-title">Parabéns, <span id="winnerName">Explorador</span>! 🎓</h3>
+            <p class="cert-sub">
               Você concluiu todas as questões do módulo <b>AstroUQuest</b>. Gere seu certificado oficial:
             </p>
             <div class="cta">
               <button class="btn" id="btnCert" type="button">Gerar Certificado</button>
               <a id="dlLink" class="btn secondary" download="certificado-astros.png" style="display:none">Baixar PNG</a>
             </div>
-            <div style="margin-top:12px">
+            <div class="canvas-wrap">
               <canvas id="certCanvas" width="1200" height="800" aria-label="Certificado"></canvas>
             </div>
           </div>
