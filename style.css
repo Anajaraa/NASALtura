@@ -79,12 +79,8 @@ header .brand span{color:var(--muted);font-size:.9rem}
 @media (min-width:930px){
   .grid{grid-template-columns:300px 1fr;}
 }
-.profile{
-  position:sticky;top:16px;
-}
-.points{
-  display:flex;align-items:center;gap:12px;margin:10px 0 6px;
-}
+.profile{position:sticky;top:16px}
+.points{display:flex;align-items:center;gap:12px;margin:10px 0 6px}
 .points b{font-size:1.6rem}
 .badge{
   background:rgba(255,209,102,.16);
@@ -93,9 +89,7 @@ header .brand span{color:var(--muted);font-size:.9rem}
   padding:6px 10px;border-radius:10px;font-weight:700;font-size:.9rem
 }
 .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-.progress{
-  height:10px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:10px
-}
+.progress{height:10px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:10px}
 .progress>span{display:block;height:100%;width:0;background:linear-gradient(90deg, var(--accent), var(--accent-2))}
 .pill{
   display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border-radius:999px;

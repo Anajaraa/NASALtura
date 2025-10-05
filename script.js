@@ -1,29 +1,46 @@
-/* ======= UTIL / STORAGE ======= */
-const LS_KEY = 'nasal-astroUquest-user';
+/* ======= STORAGE (multi-user + session) ======= */
+const USERS_KEY = 'nasal-astroUquest-users';      // { [email]: {name, pass, points, done} }
+const SESSION_KEY = 'nasal-astroUquest-session';  // { email }
+
+function getUsers(){
+  try { return JSON.parse(localStorage.getItem(USERS_KEY)) || {}; } catch { return {}; }
+}
+function setUsers(obj){ localStorage.setItem(USERS_KEY, JSON.stringify(obj)); }
+
+function getSession(){
+  try { return JSON.parse(localStorage.getItem(SESSION_KEY)) || null; } catch { return null; }
+}
+function setSession(email){ localStorage.setItem(SESSION_KEY, JSON.stringify({email})); }
+function clearSession(){ localStorage.removeItem(SESSION_KEY); }
+
+// Backward compatibility (migrate single-user schema if found)
+(function migrate(){
+  try{
+    const oldKey = 'nasal-astroUquest-user';
+    const old = JSON.parse(localStorage.getItem(oldKey));
+    if(old && old.email){
+      const users = getUsers();
+      users[old.email] = {name: old.name, pass: old.pass, points: old.points||0, done: !!old.done};
+      setUsers(users);
+      setSession(old.email);
+      localStorage.removeItem(oldKey);
+    }
+  }catch{}
+})();
+
+/* ======= QUIZ STATE ======= */
 const QuizState = {
-  user:null,         // {name, email, pass, points}
-  idx:0,             // current question index
+  user:null,         // full user object
+  email:null,
+  idx:0,
   answered:false,
   correctThis:false,
   pointsPerCorrect:2
 };
 
-function loadUser(){
-  try { return JSON.parse(localStorage.getItem(LS_KEY)) || null; } catch { return null; }
-}
-function saveUser(u){
-  localStorage.setItem(LS_KEY, JSON.stringify(u));
-}
-function logout(){
-  localStorage.removeItem(LS_KEY);
-  location.reload();
-}
-function levelFromPoints(p){
-  // simples: a cada 10 pontos sobe 1 nível
-  return 1 + Math.floor(p / 10);
-}
+function levelFromPoints(p){ return 1 + Math.floor((p||0) / 10); }
 
-/* ======= QUESTIONS (10) ======= */
+/* ======= QUESTIONS ======= */
 const QUESTIONS = [
   {q:"Em qual planeta nós vivemos?", opts:["Marte","Vênus","Terra","Saturno"], a:2},
   {q:"Qual é a estrela mais próxima da Terra?", opts:["Lua","Sol","Sirius","Júpiter"], a:1},
@@ -80,38 +97,59 @@ function switchTab(kind){
   }
 }
 
-/* ======= SIGNUP / LOGIN ======= */
+/* ======= SIGNUP ======= */
 formSignup.addEventListener('submit', (e)=>{
   e.preventDefault();
   const name = document.getElementById('suName').value.trim();
   const email= document.getElementById('suEmail').value.trim().toLowerCase();
-  const pass = document.getElementById('suPass').value;
-  const user = {name,email,pass,points:0,done:false};
-  saveUser(user);
-  startSession(user);
+  const pass = document.getElementById('suPass').value.trim();
+
+  if(!email || !pass || !name){ return alert('Preencha todos os campos.'); }
+
+  const users = getUsers();
+  // overwrite or create new
+  users[email] = users[email] ? {...users[email], name, pass} : {name, pass, points:0, done:false};
+  setUsers(users);
+  setSession(email);
+  startSession(email);
 });
 
+/* ======= LOGIN ======= */
 formLogin.addEventListener('submit', (e)=>{
   e.preventDefault();
   const email= document.getElementById('liEmail').value.trim().toLowerCase();
-  const pass = document.getElementById('liPass').value;
-  const stored = loadUser();
-  if(stored && stored.email===email && stored.pass===pass){
-    startSession(stored);
+  const pass = document.getElementById('liPass').value.trim();
+  const users = getUsers();
+  const u = users[email];
+  if(u && u.pass === pass){
+    setSession(email);
+    startSession(email);
   } else {
     alert('E-mail ou senha incorretos. Se preferir, recrie a conta na aba "Criar conta".');
   }
 });
 
 /* ======= SESSION ======= */
-function startSession(u){
+function startSession(email){
+  const users = getUsers();
+  const u = users[email];
+  if(!u){ clearSession(); return; }
   QuizState.user = u;
+  QuizState.email = email;
   authCard.style.display='none';
   dashboard.style.display='grid';
   pfName.textContent = u.name;
+  // continue last progress or start
+  QuizState.idx = u.done ? QUESTIONS.length : QuizState.idx;
   updateHUD();
-  // if user already finished, show cert; else show quiz
   if(u.done){ showCertificateArea(); } else { showQuestion(QuizState.idx); }
+}
+function persistUser(){
+  const users = getUsers();
+  if(QuizState.email){
+    users[QuizState.email] = QuizState.user;
+    setUsers(users);
+  }
 }
 function updateHUD(){
   const points = QuizState.user.points||0;
@@ -121,13 +159,13 @@ function updateHUD(){
   progressBar.style.width = prog + '%';
   counter.textContent = `Questão ${Math.min(QuizState.idx+1, QUESTIONS.length)} / ${QUESTIONS.length}`;
 }
-btnLogout.addEventListener('click', logout);
+btnLogout.addEventListener('click', ()=>{ clearSession(); location.reload(); });
 btnReset.addEventListener('click', ()=>{
   if(!confirm('Resetar progresso e pontuação?')) return;
   QuizState.user.points = 0;
   QuizState.user.done = false;
   QuizState.idx = 0;
-  saveUser(QuizState.user);
+  persistUser();
   certWrap.style.display='none';
   quizCard.style.display='block';
   showQuestion(0);
@@ -161,7 +199,7 @@ function showQuestion(i){
         feedback.textContent = 'Acertou! +2 pontos ✨';
         feedback.classList.add('ok');
         QuizState.user.points = (QuizState.user.points||0) + QuizState.pointsPerCorrect;
-        saveUser(QuizState.user);
+        persistUser();
       }else{
         b.classList.add('wrong');
         feedback.textContent = 'Ops! Tente a próxima. 💫';
@@ -179,13 +217,13 @@ function showQuestion(i){
 }
 btnNext.addEventListener('click', ()=>{
   QuizState.idx++;
-  saveUser(QuizState.user);
+  persistUser();
   showQuestion(QuizState.idx);
 });
 
 function finishQuiz(){
   QuizState.user.done = true;
-  saveUser(QuizState.user);
+  persistUser();
   showCertificateArea();
 }
 function showCertificateArea(){
@@ -315,6 +353,8 @@ function loadImage(src){
 
 /* ======= BOOT ======= */
 (function init(){
-  const u = loadUser();
-  if(u){ startSession(u); } // auto-login
+  const session = getSession();
+  if(session && session.email){
+    startSession(session.email);
+  }
 })();
